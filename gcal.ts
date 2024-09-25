@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://content.googleapis.com/calendar/v3";
+const API_BASE_URL = "https://www.googleapis.com/calendar/v3";
 
 export interface IGetCalendarEventsParams {
   /** Breakup recurring events into instances */
@@ -13,13 +13,22 @@ export interface IGetCalendarEventsParams {
   orderBy: "startTime" | "updated";
 }
 
+import { GoogleAPI } from "https://deno.land/x/google_deno_integration@v1.1/mod.ts";
+
+
 export class GoogleCalendarClient {
   #calendarId: string;
-  #apiKey: string;
+  #serviceAccountKey: { client_email: string, private_key: string };
+  #client: GoogleAPI;
 
-  constructor({ calendarId, apiKey }: { calendarId: string; apiKey: string }) {
+  constructor({ calendarId, serviceAccountKeyFile }: { calendarId: string; serviceAccountKeyFile: string }) {
     this.#calendarId = calendarId;
-    this.#apiKey = apiKey;
+    this.#serviceAccountKey = JSON.parse(Deno.readTextFileSync(serviceAccountKeyFile));
+    this.#client = new GoogleAPI({
+      email: this.#serviceAccountKey.client_email,
+      scope:  ["https://www.googleapis.com/auth/calendar", "https://www.googleapis.com/auth/calendar.readonly"],
+      key: this.#serviceAccountKey.private_key,
+    });
   }
 
   public async getEvents(
@@ -32,17 +41,14 @@ export class GoogleCalendarClient {
         timeMax: timeMax.toISOString(),
         maxResults: `${maxResults}`,
         orderBy,
-        key: this.#apiKey,
       };
-      const calendarResponse = await fetch(
+      const calendarResponse = await this.#client.get(
         `${API_BASE_URL}/calendars/${this.#calendarId}/events?${
           (new URLSearchParams(calendarRequestParams)).toString()
         }`,
-        { headers: { Referer: "discord-events-sync" } },
       );
-      const parsed = await calendarResponse.json();
 
-      return parsed;
+      return calendarResponse;
     } catch (e) {
       console.error(
         `Error getting events from Google Calendar API.`,

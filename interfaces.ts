@@ -145,6 +145,6 @@ export type CalendarEventsResponse = {
 };
 
 export type GoogleCalendarClientParams = {
-  apiKey: string;
+  serviceAccountKeyFile: string;
   calendarId: string;
 };
