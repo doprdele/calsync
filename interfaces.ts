@@ -135,6 +135,7 @@ export type CalendarEvent = {
   summary?: string;
   start?: CalendarEventDateTime;
   end?: CalendarEventDateTime;
+  creator?: { email: string };
   htmlLink?: string;
   location?: string;
   description?: string;
