@@ -1,3 +1,6 @@
+import { DiscordClient } from "./discord.ts";
+import { loadEnvConfig } from "./envConfig.ts";
+import { GoogleCalendarClient } from "./gcal.ts";
 import {
   BaseChannel,
   CalendarEvent,
@@ -11,9 +14,6 @@ import {
   EventPrivacyLevel,
   PatchEventRequestData,
 } from "./interfaces.ts";
-import { DiscordClient } from "./discord.ts";
-import { loadEnvConfig } from "./envConfig.ts";
-import { GoogleCalendarClient } from "./gcal.ts";
 
 const TWO_WEEKS = 1000 * 3600 * 24 * 7 * 2;
 
@@ -171,9 +171,9 @@ const compareEvents = (
     event1.entity_type !== event2.entity_type ||
     event1.entity_metadata?.location !== event2.entity_metadata?.location ||
     normalizeDate(event1.scheduled_end_time) !==
-      normalizeDate(event2.scheduled_end_time) ||
+    normalizeDate(event2.scheduled_end_time) ||
     normalizeDate(event1.scheduled_start_time) !==
-      normalizeDate(event2.scheduled_start_time)
+    normalizeDate(event2.scheduled_start_time)
   );
 };
 
